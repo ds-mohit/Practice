@@ -124,14 +124,41 @@ class Bank:
 
         if not userdata:
             print("Account not found")
+            return
 
+        print("You can't change your age, account no, and balance.")
+
+        newdata = {
+            "name": input("Please enter your name (press Enter to keep old): "),
+            "E-mail": input("Please enter your E-mail (press Enter to keep old): "),
+            "Pin": input("Please enter your Pin (press Enter to keep old): ")
+        }
+
+    # If the user leaves a field blank, keep the old value
+        if newdata["name"] == "":
+            newdata["name"] = userdata[0]["name"]
+        if newdata["E-mail"] == "":
+            newdata["E-mail"] = userdata[0]["E-mail"]
+        if newdata["Pin"] == "":
+            newdata["Pin"] = userdata[0]["Pin"]
         else:
-            userdata[0]['name'] = input("Please enter your name : ")
-            userdata[0]['age'] = int(input("Please enter your age : "))
-            userdata[0]['E-mail'] = input("Please enter your E-mail : ")
-            userdata[0]['Pin'] = int(input("Please enter your Pin : "))
-            Bank.__update(Bank.data)
-            print("Account details updated successfully")
+            try:
+                newdata["Pin"] = int(newdata["Pin"])
+            except ValueError:
+                print("Invalid PIN. It must be a number.")
+                return
+
+    # Preserve unchanged fields
+        newdata["age"] = userdata[0]["age"]
+        newdata["Account_no"] = userdata[0]["Account_no"]
+        newdata["Balance"] = userdata[0]["Balance"]
+
+    # Update the user record
+        for key in newdata:
+            userdata[0][key] = newdata[key]
+
+        Bank.__update(Bank.data)
+        print("Account details updated successfully")
 
     def deleteaccount(self):
         account_no = input("Please enter your account no : ")
@@ -143,9 +170,15 @@ class Bank:
             print("Account not found")
 
         else:
-            Bank.data.remove(userdata[0])
-            Bank.__update(Bank.data)
-            print("Account deleted successfully")
+            check = input(" Press Y/y if you actually want to delete the account or Press N/n ")
+
+            if check == "Y" or check == "y":
+                index = Bank.data.index(userdata[0])
+                Bank.data.pop(index)
+                Bank.__update(Bank.data)
+                print("Account deleted successfully")
+            else:
+                print("Account not deleted")
 
 
 user = Bank()
